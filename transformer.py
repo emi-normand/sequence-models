@@ -104,7 +104,8 @@ class MultiHeadAttention(nn.Module):
         query_key_attention = torch.matmul(query,torch.transpose(key,0,1))/math.sqrt(self.key_dimension)
         print(query_key_attention.shape)
         if self.mask:
-            query_key_attention = torch.triu(query_key_attention)
+            mask = torch.tril(query_key_attention) ==0
+            query_key_attention[mask] = float('-inf')
         softmax_query_key = torch.softmax(query_key_attention,1) # [seq_len,seq_len]
         self_attention = torch.matmul(softmax_query_key,value)
         return self_attention
